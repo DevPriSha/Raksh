@@ -20,22 +20,41 @@ def train():
     # predict earthquake location and time
     # return prediction as json object
 
-    dataset_count = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/count?format=text&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900".format(time.strftime("%Y-%m-%d")))
-    dataset_count = int(dataset_count.text)
+    try:
+        dataset_count = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/count?format=text&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900".format(time.strftime("%Y-%m-%d")))
+        if dataset_count.status_code != 200:
+            raise Exception
+        dataset_count = int(dataset_count.text)
+        print(dataset_count)
 
-    if dataset_count < 20000:
-        dataset = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900&limit=20000".format(time.strftime("%Y-%m-%d"))).text
-    else:
-        dataset = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900&limit=20000".format(time.strftime("%Y-%m-%d"))).text
-        dataset_count -= 20000
-        i = 0
-        while dataset_count > 0:
-            i += 1
-            dataset += requests.get("https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900&limit=20000&offset={}".format(time.strftime("%Y-%m-%d"), 20000*i)).text
-            dataset_count -= 20000
+        if dataset_count < 15000:
+            response = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900&limit=15000".format(time.strftime("%Y-%m-%d")))
+            if response.status_code != 200:
+                raise Exception
+            dataset = response.text
+            
+        else:
+            response = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900&limit=15000".format(time.strftime("%Y-%m-%d")))
+            if response.status_code != 200:
+                raise Exception
+            dataset = response.text
+            dataset_count -= 15000
+            i = 0
+            while dataset_count > 0:
+                i += 1
+                response = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900&limit=15000&offset={}".format(time.strftime("%Y-%m-%d"), 15000*i))
+                if response.status_code != 200:
+                    raise Exception
+                dataset += response.text
+                dataset_count -= 15000
+    except:
+        dataset = "finaldatasetearthquake.csv"
 
     #load data to pandas dataframe
-    df = pd.read_csv(dataset)
+    try:
+        df = pd.read_csv(dataset)
+    except:
+        return jsonify({'status': 'error', 'code' : 'csv error'})
     df['time'] = df['time'].apply(lambda x: datetime.datetime.strptime(x, "%Y-%m-%dT%H:%M:%S.%fZ"))
     df['time'] = df['time'].apply(lambda x: x.timestamp())
 
@@ -52,8 +71,11 @@ def train():
     forest_model.fit(X_train, y_train)
 
     # save the model to disk
-    filename = 'model.sav'
-    pickle.dump(forest_model, open(filename, 'wb'))
+    try:
+        filename = 'model.sav'
+        pickle.dump(forest_model, open(filename, 'wb'))
+    except:
+        return jsonify({'status': 'error', 'code' : 'model saving error'})
 
     return jsonify({'status': 'success'})
 
@@ -76,26 +98,26 @@ def predict():
     
     return jsonify({"next_earthquake": test_time, "lat": lat, "long": long, "mag": result})
 
-# route for tweets
-@app.route('/tweets', methods=['GET'])
-def tweets():
+# # route for tweets
+# @app.route('/tweets', methods=['GET'])
+# def tweets():
 
-    # Authenticate to Twitter
-    auth = tweepy.OAuthHandler("consumer_key", "consumer_secret")
-    auth.set_access_token("access_token", "access_token_secret")
+#     # Authenticate to Twitter
+#     auth = tweepy.OAuthHandler("consumer_key", "consumer_secret")
+#     auth.set_access_token("access_token", "access_token_secret")
 
-    # Create API object
-    api = tweepy.API(auth)
+#     # Create API object
+#     api = tweepy.API(auth)
 
-    # Define the disaster keyword
-    disaster_keyword = "disaster"
+#     # Define the disaster keyword
+#     disaster_keyword = "disaster"
 
-    # Fetch tweets containing the disaster keyword
-    public_tweets = api.search(disaster_keyword)
+#     # Fetch tweets containing the disaster keyword
+#     public_tweets = api.search(disaster_keyword)
 
-    # Iterate over the tweets and print the text
-    for tweet in public_tweets:
-        print(tweet.text)
+#     # Iterate over the tweets and print the text
+#     for tweet in public_tweets:
+#         print(tweet.text)
 
 
 if __name__ == '__main__':
