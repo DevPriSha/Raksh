@@ -61,6 +61,20 @@ def train():
 
 
 # route for predict
+#need user lat and long
+@app.route('/predict', methods=['GET', 'POST'])
+def predict():
+    lat = request.args.get('lat')
+    long = request.args.get('long')
+    # load the model from disk
+    loaded_model = pickle.load(open('model.sav', 'rb'))
+    result = 0
+    test_time = time.time()
+    while result < 5.4:
+        result = loaded_model.predict([[test_time, lat, long]])[0][0]
+        test_time+=3600
+    
+    return jsonify({"next_earthquake": test_time, "lat": lat, "long": long, "mag": result})
 
 # route for tweets
 @app.route('/tweets', methods=['GET'])
