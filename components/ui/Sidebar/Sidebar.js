@@ -19,11 +19,11 @@ import {
 } from "../../../utils/LayoutContext";
 
 const structure = [
-  { id: 22, label: "Alert", link: "/", icon: <DataObjectIcon/> },
-  { id: 1, label: 'Real Time', link: '/real-time', icon: <SensorsSharpIcon /> },
+  { id: 22, label: "Real Time", link: "/", icon: <DataObjectIcon/> },
+  { id: 1, label: 'Prediction', link: '/prediction', icon: <SensorsSharpIcon /> },
   { id: 3, type: 'divider' },
-  { id: 4, type: "title", label: "Details" },
-  { id: 7, label: "All Data", link: "/data", icon: <StorageSharpIcon /> },
+  { id: 4, type: "title", label: "Training" },
+  { id: 7, label: "Safety", link: "/safety", icon: <StorageSharpIcon /> },
   { id: 8, type: "divider" },
 ];
 
