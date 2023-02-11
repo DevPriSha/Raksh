@@ -89,14 +89,19 @@ def predict():
     lat = request.args.get('lat')
     long = request.args.get('long')
     # load the model from disk
-    loaded_model = pickle.load(open('model.sav', 'rb'))
+    try:
+        loaded_model = pickle.load(open('model.sav', 'rb'))
+        print("yes")
+    except:
+        return jsonify({'status': 'error', 'code' : 'model loading error'})
     result = 0
     test_time = time.time()
-    while result < 5.4:
+    while result < 2.4:
         result = loaded_model.predict([[test_time, lat, long]])[0][0]
         test_time+=3600
+        print(result, test_time)
     
-    return jsonify({"next_earthquake": test_time, "lat": lat, "long": long, "mag": result})
+    return jsonify({"next_earthquake": time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime(test_time)), "lat": lat, "long": long, "mag": result})
 
 # # route for tweets
 # @app.route('/tweets', methods=['GET'])
