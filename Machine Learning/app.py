@@ -3,12 +3,17 @@ import pickle
 import time
 import requests
 import pandas as pd
-import tweepy
+import datetime
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error
+# import tweepy
 
 app = Flask(__name__)
 
+# run this route at 00:00 everyday on server end
 @app.route('/train', methods=['GET'])
-def predict():
+def train():
     # predict next earthquake location and time using the pickled model
     # return the prediction as a json object
     # get data from earthquake api
@@ -31,10 +36,28 @@ def predict():
 
     #load data to pandas dataframe
     df = pd.read_csv(dataset)
-    df = df.dropna()
+    df['time'] = df['time'].apply(lambda x: datetime.datetime.strptime(x, "%Y-%m-%dT%H:%M:%S.%fZ"))
+    df['time'] = df['time'].apply(lambda x: x.timestamp())
 
-    #train model
-    from sklearn.linear_model import LinearRegression
+    df = df[['time', 'latitude', 'longitude', 'depth', 'mag']]
+
+    df = df.fillna(0)
+
+    X = df[['time', 'latitude', 'longitude']]
+    y = df[['mag', 'depth']]
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    forest_model = RandomForestRegressor(random_state=32)
+    forest_model.fit(X_train, y_train)
+
+    # save the model to disk
+    filename = 'model.sav'
+    pickle.dump(forest_model, open(filename, 'wb'))
+
+    return jsonify({'status': 'success'})
+
+
 
 
 # route for predict
