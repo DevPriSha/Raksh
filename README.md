@@ -10,6 +10,7 @@ You can try out Raksh at [https://hack-nsut.igscs.in/!](https://hack-nsut.igscs.
 ### Prerequisites
 - [Node.js](https://nodejs.org/en/download/)
 - [MongoDB](https://docs.mongodb.com/manual/installation/)
+- [NPM](https://docs.npmjs.com/cli/v9/commands/npm-install/)
 - [Yarn](https://yarnpkg.com/en/docs/install)
 - [Git](https://git-scm.com/downloads)
 - [python](https://www.python.org/downloads/)
@@ -25,7 +26,7 @@ yarn install
 ```
 - Start the server
 ```bash
-yarn start
+npm run dev
 ```
 - Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
