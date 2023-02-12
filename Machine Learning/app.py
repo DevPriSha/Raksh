@@ -21,20 +21,20 @@ def train():
     # return prediction as json object
 
     try:
-        dataset_count = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/count?format=text&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900".format(time.strftime("%Y-%m-%d")))
+        dataset_count = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/count?format=text&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900".format((datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")))
         if dataset_count.status_code != 200:
             raise Exception
         dataset_count = int(dataset_count.text)
         print(dataset_count)
 
         if dataset_count < 15000:
-            response = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900&limit=15000".format(time.strftime("%Y-%m-%d")))
+            response = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900&limit=15000".format((datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")))
             if response.status_code != 200:
                 raise Exception
             dataset = response.text
             
         else:
-            response = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900&limit=15000".format(time.strftime("%Y-%m-%d")))
+            response = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900&limit=15000".format((datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")))
             if response.status_code != 200:
                 raise Exception
             dataset = response.text
@@ -42,12 +42,13 @@ def train():
             i = 0
             while dataset_count > 0:
                 i += 1
-                response = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900&limit=15000&offset={}".format(time.strftime("%Y-%m-%d"), 15000*i))
+                response = requests.get("https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=1900-01-01&endtime={}&latitude=20.5937&longitude=78.9629&maxradiuskm=1900&limit=15000&offset={}".format((datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d"), 15000*i))
                 if response.status_code != 200:
                     raise Exception
                 dataset += response.text
                 dataset_count -= 15000
     except:
+        print("using existing dataset")
         dataset = "finaldatasetearthquake.csv"
 
     #load data to pandas dataframe
