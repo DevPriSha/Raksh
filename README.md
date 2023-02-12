@@ -1,9 +1,12 @@
-# Raksh
+# RAKSH
+![](https://cdn.discordapp.com/attachments/992337104510144532/1074259326241349642/image-removebg-preview-5-2.png) 
 <!-- short description -->
+A contemporary system called **RAKSH**, your personal disaster alarm system, is a cutting-edge tool that detects disasters in real time and aids in mitigation through an intuitive web interface.
+Real-time monitoring of natural disasters is made possible with our RAKSH, allowing for prompt and efficient responses. Our RAKSH can aid in the preservation of life and property by offering precise information on the location and intensity of disasters. Disaster relief workers can more effectively target their efforts and deliver supplies more quickly by using this information. Additionally, it may spot potential risks like fires or floods before they become an issue. During emergencies, RAKSH may be a vital tool for safeguarding public safety.
 
 
 ## Raksh in Action!
-You can try out Raksh at [https://hack-nsut.igscs.in/!](https://hack-nsut.igscs.in/)
+You can try out Raksh at [https://hack-nsut.igscs.in/](https://hack-nsut.igscs.in/) !
 <!-- Screenshots -->
 
 ## Running Raksh locally
